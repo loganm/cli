@@ -158,11 +158,14 @@ export async function renderList(command: Command, testRuns: Heroku.TestRun[], p
 
   const socket = new Socket(HEROKU_CI_WEBSOCKET_URL, {
     transport: WebSocket,
+    params: {
+      token: command.heroku.auth,
+    },
     logger: (kind: any, msg: any, data: any) => debug(`${kind}: ${msg}\n${inspect(data)}`),
   })
   socket.connect()
 
-  const channel = socket.channel(`events:pipelines/${pipeline.id}/test-runs`, {token: command.heroku.auth})
+  const channel = socket.channel(`events:pipelines/${pipeline.id}/test-runs`, {})
 
   channel.on('create', ({data}: any) => {
     testRuns = handleTestRunEvent(data, testRuns)
